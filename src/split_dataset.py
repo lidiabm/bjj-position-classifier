@@ -10,7 +10,7 @@ OUTPUT_SPLITS = "data/splits"
 
 os.makedirs(OUTPUT_SPLITS, exist_ok=True)
 
-# Cargar JSON
+# Carregar JSON
 with open(ANNOT_PATH, "r") as f:
     annotations = json.load(f)
 
@@ -27,7 +27,7 @@ for ann in annotations:
     })
 
 df = pd.DataFrame(samples)
-print("Total muestras:", len(df))
+print("Mostres totals:", len(df))
 
 # Split en train, validation i test  
 train_val, test = train_test_split(
@@ -50,5 +50,5 @@ test.to_csv(os.path.join(OUTPUT_SPLITS, "test.csv"), index=False)
 
 print("Splits generats:")
 print(f"  Train: {len(train)}")
-print(f"  Val:   {len(val)}")
+print(f"  Validation:   {len(val)}")
 print(f"  Test:  {len(test)}")
