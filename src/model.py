@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras import layers, Model
-from tensorflow.keras.applications import EfficientNetB0
+from tensorflow.keras.applications import MobileNetV2
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
 
 def build_model(num_classes: int, input_shape=(224, 224, 3), backbone_trainable: bool = False):
@@ -19,10 +20,10 @@ def build_model(num_classes: int, input_shape=(224, 224, 3), backbone_trainable:
         tf.keras.Model: Model llest per compilar i entrenar.
     """
 
-    # Es carrega backbone preentrenat (EfficientNetB0)
-    base = EfficientNetB0(
-        weights="imagenet",
-        include_top=False,
+    # Es carrega backbone preentrenat (MobileNetV2)
+    base = MobileNetV2(
+        weights="imagenet", 
+        include_top=False, 
         input_shape=input_shape
     )
 

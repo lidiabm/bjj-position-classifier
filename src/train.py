@@ -1,17 +1,17 @@
 import tensorflow as tf
-from .config import TRAIN_CSV, VAL_CSV, TEST_CSV, MODELS_DIR, OUTPUTS_DIR, LR, EPOCHS
-from .data import load_splits, build_label_mapping, add_labels, make_dataset
+from .config import TRAIN_CSV, VAL_CSV, TEST_CSV, MODELS_DIR, OUTPUTS_DIR, LR, EPOCHS, IMG_SIZE
+from .data import load_trainval_splits, build_label_mapping, add_labels, make_dataset
 from .model import build_model, compile_model
 from .utils import ensure_dir, save_json
 
 def main():
-    
+
     # Crea les carpetes de sortida (assegura que existeixen)
     ensure_dir(MODELS_DIR)
     ensure_dir(OUTPUTS_DIR)
 
     # Carrega els splits (csv). El test_df es carrega, però NO s'usa en l'entrenament, sinó en evaluate.py)
-    train_df, val_df, test_df = load_splits(TRAIN_CSV, VAL_CSV, TEST_CSV)
+    train_df, val_df = load_trainval_splits(TRAIN_CSV, VAL_CSV)
 
     # Crea el mapping de classes en train i converteix etiquetes string a enters
     classes, class_to_idx = build_label_mapping(train_df)
@@ -23,7 +23,7 @@ def main():
     val_ds = make_dataset(val_df, training=False)
 
     # Construeix i compila el model
-    model = build_model(num_classes=len(classes), input_shape=(224, 224, 3), backbone_trainable=False)
+    model = build_model(num_classes=len(classes), input_shape=(IMG_SIZE[0], IMG_SIZE[1], 3), backbone_trainable=False)
     model = compile_model(model, lr=LR)
 
     # Guarda mapping per avaluació i interpretació

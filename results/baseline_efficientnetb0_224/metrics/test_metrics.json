@@ -1,0 +1,12 @@
+{
+  "model_path": "models\\baseline_efficientnetb0.keras",
+  "test_loss": 0.647077202796936,
+  "test_accuracy": 0.7828400399068839,
+  "keras_accuracy": 0.7828400135040283,
+  "f1_macro": 0.7410992045956132,
+  "f1_weighted": 0.780040073559218,
+  "precision_macro": 0.7670443143826822,
+  "recall_macro": 0.7411337927391854,
+  "num_test_samples": 24056,
+  "num_classes": 18
+}

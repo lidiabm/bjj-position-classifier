@@ -3,7 +3,7 @@ import tensorflow as tf
 from tensorflow.keras.applications.efficientnet import preprocess_input
 from .config import IMG_SIZE, BATCH_SIZE, SEED
 
-def load_splits(train_csv: str, val_csv: str, test_csv: str):
+def load_trainval_splits(train_csv: str, val_csv: str):
     """
     Carrega els CSV dels splits del dataset (train, validation i test)
     Aquests CSV contenen, com a mínim: image_path (ruta de la imatge) i position (etiqueta de la posició)
@@ -22,9 +22,8 @@ def load_splits(train_csv: str, val_csv: str, test_csv: str):
 
     train_df = pd.read_csv(train_csv)
     val_df = pd.read_csv(val_csv)
-    test_df = pd.read_csv(test_csv)
 
-    return train_df, val_df, test_df
+    return train_df, val_df
 
 
 def build_label_mapping(train_df: pd.DataFrame):
