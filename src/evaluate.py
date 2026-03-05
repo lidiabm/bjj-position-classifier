@@ -1,4 +1,3 @@
-
 import os
 import json
 import numpy as np
@@ -12,37 +11,61 @@ from .utils import ensure_dir
 
 def save_table_as_image(df: pd.DataFrame, path: str, title: str | None = None):
     """
-    Guarda un DataFrame (taula) amb la imatge PNG per poder-la visualitzar fàcilment
+    Guarda un DataFrame com a imatge (PNG) amb una taula llegible.
 
     Args:
         df (pd.DataFrame): Taula a convertir a imatge.
         path (str): Ruta de sortida (PNG).
-        title (str | None): Títol opcional a la figura.
+        title (str | None): Títol opcional de la figura.
     """
     ensure_dir(os.path.dirname(path))
 
-    # Ajustem la mida en funció del nombre de files 
+    # Convertim tots els valors a string amb format uniforme
+    cell_text = []
+    for row in df.values:
+        formatted_row = []
+        for v in row:
+            if isinstance(v, (int, float, np.number)):
+                formatted_row.append(f"{v:.3f}")
+            else:
+                formatted_row.append(str(v))
+        cell_text.append(formatted_row)
+
+    # Ajustar mida de la figura segons el nombre de files
     n_rows = max(1, len(df))
-    fig_h = min(0.35 * n_rows + 2.5, 20)
-    plt.figure(figsize=(12, fig_h))
-    plt.axis("off")
+    fig_h = min(0.45 * n_rows + 2.5, 20)
+
+    fig, ax = plt.subplots(figsize=(12, fig_h))
+    ax.axis("off")
 
     if title:
-        plt.title(title, pad=15)
+        ax.set_title(title, fontsize=14, fontweight="bold", pad=15)
 
-    table = plt.table(
-        cellText=np.round(df.values, 3),
+    table = ax.table(
+        cellText=cell_text,
         colLabels=df.columns,
         rowLabels=df.index,
         loc="center",
+        cellLoc="center",
+        colLoc="center"
     )
 
     table.auto_set_font_size(False)
-    table.set_fontsize(9)
-    table.scale(1, 1.4)
+    table.set_fontsize(10)
+    table.scale(1, 1.5)
+
+    # Estil visual
+    for (row, col), cell in table.get_celld().items():
+
+        if row == 0:            
+            cell.set_facecolor("#40466e")   # capçalera
+            cell.set_text_props(color="white", weight="bold")
+        elif row % 2 == 0:      
+            cell.set_facecolor("#f2f2f2")   # zebra stripes
+        cell.set_edgecolor("#dddddd")       # bordes suaus
 
     plt.tight_layout()
-    plt.savefig(path, dpi=300)
+    plt.savefig(path, dpi=300, bbox_inches="tight")
     plt.close()
 
 
@@ -66,6 +89,7 @@ def save_confusion_matrix(cm: np.ndarray, class_names: list, out_path: str, norm
         row_sums = cm_plot.sum(axis=1, keepdims=True)
         cm_plot = np.divide(cm_plot, row_sums, out=np.zeros_like(cm_plot), where=row_sums != 0)
 
+    plt.style.use("seaborn-v0_8-whitegrid")
     plt.figure(figsize=(10, 8))
     plt.imshow(cm_plot, interpolation="nearest")
     plt.title("Confusion Matrix" + (" (normalized)" if normalize else ""))
@@ -85,7 +109,6 @@ def save_confusion_matrix(cm: np.ndarray, class_names: list, out_path: str, norm
                 color="white" if cm_plot[i, j] > thresh else "black",
                 fontsize=7
             )
-
     plt.ylabel("True label")
     plt.xlabel("Predicted label")
     plt.tight_layout()
@@ -94,26 +117,43 @@ def save_confusion_matrix(cm: np.ndarray, class_names: list, out_path: str, norm
     plt.savefig(out_path, dpi=200)
     plt.close()
 
-def save_f1_per_class(report_df: pd.DataFrame, class_names: list, out_path: str):
+def save_metrics_per_class(report_df: pd.DataFrame, class_names: list, out_path: str):
     """
-    Guarda un gràfic de barres amb l'F1-score per classe.
-    Aquest gràfic és molt útil per veure quines posicions són més difícils.
+    Guarda un gràfic de barres amb precision, recall i F1-score per classe.
 
     Args:
         report_df (pd.DataFrame): DataFrame del classification_report.
-        class_names (list): Llista de classes (només les classes, sense 'macro avg', etc.)
+        class_names (list): Llista de classes reals.
         out_path (str): Ruta de sortida (PNG).
     """
     ensure_dir(os.path.dirname(out_path))
 
-    per_class = report_df.loc[class_names].copy()
+    per_class = report_df.loc[class_names]
 
-    plt.figure(figsize=(12, 5))
-    plt.bar(per_class.index, per_class["f1-score"].values)
-    plt.xticks(rotation=45, ha="right")
-    plt.ylabel("F1-score")
-    plt.title("F1-score per classe")
+    precision = per_class["precision"].values
+    recall = per_class["recall"].values
+    f1 = per_class["f1-score"].values
+
+    x = np.arange(len(class_names))
+    width = 0.25
+
+    cmap = plt.get_cmap("GnBu")
+    colors = [cmap(0.35), cmap(0.55), cmap(0.75)]
+
+    plt.style.use("seaborn-v0_8-whitegrid")
+    plt.figure(figsize=(14,6))
+    plt.bar(x - width, precision, width, label="Precision", color=colors[0])
+    plt.bar(x, recall, width, label="Recall", color=colors[1])
+    plt.bar(x + width, f1, width, label="F1-score", color=colors[2])
+
+    plt.xticks(x, class_names, rotation=45, ha="right")
+    plt.ylabel("Score")
+    plt.title("Precision, Recall i F1-score per classe")
+    plt.ylim(0,1)
+
+    plt.legend()
     plt.grid(True, axis="y")
+
     plt.tight_layout()
     plt.savefig(out_path, dpi=200)
     plt.close()
@@ -133,9 +173,13 @@ def save_confidence_histograms(y_prob: np.ndarray, y_true: np.ndarray, y_pred: n
     conf = np.max(y_prob, axis=1)
     correct = (y_true == y_pred)
 
+    cmap = plt.get_cmap("GnBu")
+    colors = [cmap(0.35), cmap(0.75)]
+    
+    plt.style.use("seaborn-v0_8-whitegrid")
     plt.figure(figsize=(7, 4))
-    plt.hist(conf[correct], bins=30, alpha=0.7, label="Correctes")
-    plt.hist(conf[~correct], bins=30, alpha=0.7, label="Incorrectes")
+    plt.hist(conf[correct], bins=30, alpha=0.7, label="Correctes", color=colors[0])
+    plt.hist(conf[~correct], bins=30, alpha=0.7, label="Incorrectes", color=colors[1])
     plt.xlabel("Confiança (max softmax)")
     plt.ylabel("Freqüència")
     plt.title("Distribució de confiança: correctes vs incorrectes")
@@ -224,7 +268,7 @@ def main():
     metrics_df = pd.DataFrame([metrics])
     metrics_df.to_csv(os.path.join(metrics_dir,"metrics.csv"), index=False)
     metrics_df_num = metrics_df.drop(columns=["model_path", "run_name"], errors="ignore")
-    save_table_as_image(metrics_df_num, os.path.join(metrics_dir, "metrics.png"))
+    save_table_as_image(metrics_df_num, os.path.join(metrics_dir, "metrics.png"), title="Mètriques globals del model (test)")
 
     
         # Report per classe (CSV + PNG)
@@ -244,22 +288,13 @@ def main():
     save_confusion_matrix(cm, class_names, os.path.join(figures_dir, "confusion_matrix_norm.png"), normalize=True)
 
         # F1 per classe (gràfic de barres)
-    save_f1_per_class(report_df, class_names, os.path.join(figures_dir, "f1_per_class.png"))
+    save_metrics_per_class(report_df, class_names, os.path.join(figures_dir, "f1_precision_recall_per_class.png"))
         
         # Histograma de confiança: correctes vs incorrectes
     save_confidence_histograms(y_prob, y_true, y_pred, os.path.join(figures_dir, "confidence_hist.png"))
     
     # Imprimir resum per consola 
-    print("\n=== TEST RESULTS ===")
-    print(f"Run: {run_name}")
-    print(f"Loss: {loss:.4f}")
-    print(f"Accuracy: {acc:.4f}")
-    print(f"F1 macro: {f1_macro:.4f}")
-    print(f"F1 weighted: {f1_weighted:.4f}")
-    print(f"Precision macro: {prec_macro:.4f}")
-    print(f"Recall macro: {rec_macro:.4f}")
-
-    print("\nSaved:")
+    print("\n Resultats en test guardats a: ")
     print(f"- {os.path.join(metrics_dir, 'test_metrics.json')}")
     print(f"- {os.path.join(metrics_dir, 'metrics.csv')}")
     print(f"- {os.path.join(metrics_dir, 'metrics.png')}")
@@ -268,7 +303,7 @@ def main():
     print(f"- {os.path.join(preds_dir, 'test_predictions.csv')}")
     print(f"- {os.path.join(figures_dir, 'confusion_matrix.png')}")
     print(f"- {os.path.join(figures_dir, 'confusion_matrix_norm.png')}")
-    print(f"- {os.path.join(figures_dir, 'f1_per_class.png')}")
+    print(f"- {os.path.join(figures_dir, 'f1_precision_recall_per_class.png')}")
     print(f"- {os.path.join(figures_dir, 'confidence_hist.png')}")
 
 
