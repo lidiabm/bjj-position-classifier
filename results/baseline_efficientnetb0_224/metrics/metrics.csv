@@ -1,2 +1,2 @@
-model_path,test_loss,test_accuracy,keras_accuracy,f1_macro,f1_weighted,precision_macro,recall_macro,num_test_samples,num_classes
-models\baseline_efficientnetb0.keras,0.647077202796936,0.7828400399068839,0.7828400135040283,0.7410992045956132,0.780040073559218,0.7670443143826822,0.7411337927391854,24056,18
+model_path,test_loss,test_accuracy,keras_accuracy,top3_accuracy,top5_accuracy,f1_macro,f1_weighted,precision_macro,recall_macro,ece,num_test_samples,num_classes
+models\baseline_efficientnetb0.keras,0.647077202796936,0.7828400399068839,0.7828400135040283,0.9526105753242434,0.9842866644496175,0.7410992045956132,0.780040073559218,0.7670443143826822,0.7411337927391854,0.028077040064620314,24056,18
