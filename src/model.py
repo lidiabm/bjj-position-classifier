@@ -6,14 +6,14 @@ from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
 def build_model(num_classes: int, input_shape=(224, 224, 3), backbone_trainable: bool = False):
     """
-    Construeix el model de classificació basat en transfer learning amb EfficientNetB0.
-    En aquesta cas, usem EfficientNetB0 preentrenada amb ImageNet com a extractor de característiques.
+    Construeix el model de classificació basat en transfer learning amb MobileNetV2.
+    En aquesta cas, usem MobileNetV2 preentrenada amb ImageNet com a extractor de característiques.
     A més, afegim una "capa de capçalera" (classification head) a sobre per classificar les 18 posicions.
 
     Args:
         num_classes (int): Nombre de classes a predir (18).
         input_shape (tuple): Forma de la imatge d'entrada (H, W, C).
-        backbone_trainable (bool): Si False, es congelen els pesos d'EfficientNet (baseline).
+        backbone_trainable (bool): Si False, es congelen els pesos d'MobileNetV2 (baseline).
                                    Si True, es permet el fine-tuning (entrenar també part del backbone).
 
     Returns:
@@ -33,8 +33,11 @@ def build_model(num_classes: int, input_shape=(224, 224, 3), backbone_trainable:
     # Es defineix l'entrada del model
     inputs = layers.Input(shape=input_shape)
 
+    # Preprocessat específic de MobileNetV2
+    x = preprocess_input(inputs)
+
     # Es passar la imatge pel backbone.
-    x = base(inputs, training=False)
+    x = base(x, training=False)
 
     # Es redueix el mapa de característiques a un vector (embedding)
     x = layers.GlobalAveragePooling2D()(x)
@@ -53,7 +56,8 @@ def build_model(num_classes: int, input_shape=(224, 224, 3), backbone_trainable:
 
 def compile_model(model: tf.keras.Model, lr: float = 1e-3):
     """
-    Compila el model amb l'optimitzador, la funció de pèrdua i les mètriques.
+    Compila el model amb l'optimitzador, la funció de pèrdua i les mètriques que es mostraran durant 
+    l'entrenament. 
 
     Args:
         model (tf.keras.Model): Model creat amb build_model().
@@ -64,9 +68,9 @@ def compile_model(model: tf.keras.Model, lr: float = 1e-3):
     """
 
     model.compile(
-        optimizer=tf.keras.optimizers.Adam(learning_rate=lr),
-        loss="sparse_categorical_crossentropy",
-        metrics=["accuracy"]
+        optimizer=tf.keras.optimizers.Adam(learning_rate=lr),   # optimitzador és l'algoritme que actualitza els pesos  
+        loss="sparse_categorical_crossentropy",                 # loss mesura quant de malament prediu el model 
+        metrics=["accuracy"]                                    # metricas que s'usen per monitorizar el rendiment 
     )
 
     return model

@@ -12,6 +12,8 @@ MODELS_DIR = "models"       # directori on es troben els models
 OUTPUTS_DIR = "outputs"     # directori on es troben les sortides 
 RESULTS_DIR = "results"     # directori on es troben els resultats del model en en conjunt de test 
 
-BACKBONE = "EfficientNetB0" # backbone del model (quina CNN preentrenada s'usarà com a base)
+EXPERIMENT_NAME = "mobilenetv2_baseline" # nom del experiment
+BACKBONE = "MobileNetV2"    # backbone del model (quina CNN preentrenada s'usarà com a base)
+
 LR = 1e-3                   # learning rate
-EPOCHS = 10                 # quantes vegades el model veu el dataset
+EPOCHS = 3                  # quantes vegades el model veu el dataset

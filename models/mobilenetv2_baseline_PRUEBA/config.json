@@ -1,0 +1,17 @@
+{
+  "experiment_name": "mobilenetv2_baseline_PRUEBA",
+  "backbone": "MobileNetV2",
+  "input_shape": [
+    160,
+    160,
+    3
+  ],
+  "num_classes": 18,
+  "learning_rate": 0.001,
+  "epochs": 3,
+  "backbone_trainable": false,
+  "loss": "sparse_categorical_crossentropy",
+  "metrics": [
+    "accuracy"
+  ]
+}

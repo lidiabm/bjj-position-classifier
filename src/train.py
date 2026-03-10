@@ -1,16 +1,63 @@
 import tensorflow as tf
-from .config import TRAIN_CSV, VAL_CSV, TEST_CSV, MODELS_DIR, OUTPUTS_DIR, LR, EPOCHS, IMG_SIZE
+import os
+from .config import TRAIN_CSV, VAL_CSV, MODELS_DIR, OUTPUTS_DIR, LR, EPOCHS, IMG_SIZE, BACKBONE, EXPERIMENT_NAME
 from .data import load_trainval_splits, build_label_mapping, add_labels, make_dataset
 from .model import build_model, compile_model
-from .utils import ensure_dir, save_json
+from .utils import ensure_dir, save_json, save_model_artifacts
+
+def build_callbacks(model_dir):
+    """
+    Crea i retorna la llista de callbacks que s'utilitzaran durant l'entrenament.
+
+    Els callbacks permeten modificar o monitoritzar el procés d'entrenament automàticament
+    en cada epoch. En aquest cas s'utilitzen per:
+    - parar l'entrenament si el model deixa de millorar
+    - reduir el learning rate si la validació s'estanca
+    - guardar automàticament el millor model obtingut
+    - registrar les mètriques d'entrenament en un arxiu CSV
+
+    Args:
+        model_dir (str): Directori on es guardaran els artefactes de l'entrenament.
+
+    Returns:
+        list: Llista de callbacks de Keras que es passaran a `model.fit()`.   
+    """
+
+    return [
+        tf.keras.callbacks.EarlyStopping(
+            monitor="val_loss",
+            patience=5,
+            restore_best_weights=True,
+            verbose=1
+        ),
+        tf.keras.callbacks.ReduceLROnPlateau(
+            monitor="val_loss",
+            factor=0.5,
+            patience=2,
+            min_lr=1e-6,
+            verbose=1
+        ),
+        tf.keras.callbacks.ModelCheckpoint(
+            filepath=os.path.join(model_dir, "best_model.keras"),
+            monitor="val_accuracy",
+            mode="max",
+            save_best_only=True,
+            verbose=1
+        ),
+        tf.keras.callbacks.CSVLogger(
+            filename=os.path.join(model_dir, "history.csv"),
+            append=False
+        )
+    ]
 
 def main():
+    # Crea les carperes de sortida  
+    model_dir = os.path.join(MODELS_DIR, EXPERIMENT_NAME)
+    output_dir = os.path.join(OUTPUTS_DIR, EXPERIMENT_NAME)
+    ensure_dir(model_dir)
+    ensure_dir(output_dir)
 
-    # Crea les carpetes de sortida (assegura que existeixen)
-    ensure_dir(MODELS_DIR)
-    ensure_dir(OUTPUTS_DIR)
-
-    # Carrega els splits (csv). El test_df es carrega, però NO s'usa en l'entrenament, sinó en evaluate.py)
+    # Carrega els splits d'entrenament i validació (csv)
     train_df, val_df = load_trainval_splits(TRAIN_CSV, VAL_CSV)
 
     # Crea el mapping de classes en train i converteix etiquetes string a enters
@@ -26,28 +73,36 @@ def main():
     model = build_model(num_classes=len(classes), input_shape=(IMG_SIZE[0], IMG_SIZE[1], 3), backbone_trainable=False)
     model = compile_model(model, lr=LR)
 
+    # Guarda artefactes del model
+    save_model_artifacts(
+        model=model, 
+        run_dir=model_dir,
+        config={
+            "experiment_name": EXPERIMENT_NAME,
+            "backbone": BACKBONE,
+            "input_shape": [IMG_SIZE[0], IMG_SIZE[1], 3],
+            "num_classes": len(classes),
+            "learning_rate": LR,
+            "epochs": EPOCHS,
+            "backbone_trainable": False,
+            "loss": "sparse_categorical_crossentropy",
+            "metrics": ["accuracy"],
+        }
+    )
+
     # Guarda mapping per avaluació i interpretació
-    save_json(class_to_idx, f"{OUTPUTS_DIR}/class_to_idx.json")
+    save_json(class_to_idx, os.path.join(output_dir, "class_to_idx.json"))
 
     # Callbacks
-    # - EarlyStopping: para quan no millora la validació
-    # - ModelCheckpoint: guarda el millor model segons val_accuracy
-    callbacks = [
-        tf.keras.callbacks.EarlyStopping(
-            monitor="val_loss",
-            patience=5,
-            restore_best_weights=True
-        ),
-        tf.keras.callbacks.ModelCheckpoint(
-            filepath=f"{MODELS_DIR}/baseline_efficientnetb0.keras",
-            monitor="val_accuracy",
-            save_best_only=True
-        ),
-    ]
+    callbacks = build_callbacks(model_dir)
 
     # Entrena
-    model.fit(train_ds, validation_data=val_ds, epochs=EPOCHS, callbacks=callbacks)
-
+    model.fit(
+        train_ds, 
+        validation_data=val_ds, 
+        epochs=EPOCHS, 
+        callbacks=callbacks
+    )
 
 if __name__ == "__main__":
     main()
