@@ -53,9 +53,7 @@ def build_callbacks(model_dir):
 def main():
     # Crea les carperes de sortida  
     model_dir = os.path.join(MODELS_DIR, EXPERIMENT_NAME)
-    output_dir = os.path.join(OUTPUTS_DIR, EXPERIMENT_NAME)
     ensure_dir(model_dir)
-    ensure_dir(output_dir)
 
     # Carrega els splits d'entrenament i validació (csv)
     train_df, val_df = load_trainval_splits(TRAIN_CSV, VAL_CSV)
@@ -86,12 +84,9 @@ def main():
             "epochs": EPOCHS,
             "backbone_trainable": False,
             "loss": "sparse_categorical_crossentropy",
-            "metrics": ["accuracy"],
+            "metrics": ["accuracy", "top_3_accuracy"],
         }
     )
-
-    # Guarda mapping per avaluació i interpretació
-    save_json(class_to_idx, os.path.join(output_dir, "class_to_idx.json"))
 
     # Callbacks
     callbacks = build_callbacks(model_dir)

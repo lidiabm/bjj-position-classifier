@@ -6,7 +6,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from sklearn.metrics import (classification_report, confusion_matrix, f1_score, precision_score, recall_score, accuracy_score)
-from .config import TEST_CSV, MODELS_DIR, OUTPUTS_DIR, RESULTS_DIR
+from .config import TEST_CSV, MODELS_DIR, OUTPUTS_DIR, RESULTS_DIR, EXPERIMENT_NAME
 from .data import add_labels, make_dataset
 from .utils import ensure_dir
 
@@ -415,7 +415,7 @@ def save_confidence_histograms(y_prob: np.ndarray, y_true: np.ndarray, y_pred: n
 
 def main():
     # Directoris de sortida
-    run_name = "baseline_efficientnetb0_224"    # canvia segons l'experiment 
+    run_name = EXPERIMENT_NAME    # canvia segons l'experiment 
     run_dir = os.path.join(RESULTS_DIR, run_name)
 
     figures_dir = os.path.join(run_dir, "figures")
@@ -442,11 +442,11 @@ def main():
     test_ds = make_dataset(test_df, training=False)
 
     # Carregar model entrenat 
-    model_path = os.path.join(MODELS_DIR, "baseline_efficientnetb0.keras")
+    model_path = os.path.join(MODELS_DIR, EXPERIMENT_NAME, "best_model.keras")
     model = tf.keras.models.load_model(model_path)
 
     # Evaluació bàsica amb Keras (loss + accuracy)
-    loss, keras_acc = model.evaluate(test_ds, verbose=0)
+    loss, keras_acc, keras_top3 = model.evaluate(test_ds, verbose=0)
 
     # Prediccions 
     y_prob = model.predict(test_ds, verbose=0)  # retorna la probabilitat per classe per cada imatge
@@ -483,6 +483,7 @@ def main():
         "test_loss": float(loss),
         "test_accuracy": float(acc),
         "keras_accuracy": float(keras_acc),
+        "keras_top3": float(keras_top3),
         "top3_accuracy": float(top3_acc),
         "top5_accuracy": float(top5_acc),
         "f1_macro": float(f1_macro),

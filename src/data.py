@@ -1,6 +1,5 @@
 import pandas as pd
 import tensorflow as tf
-from tensorflow.keras.applications.efficientnet import preprocess_input
 from .config import IMG_SIZE, BATCH_SIZE, SEED
 
 def load_trainval_splits(train_csv: str, val_csv: str):
@@ -100,10 +99,13 @@ def decode_resize(path: tf.Tensor, label: tf.Tensor):
     img = tf.image.decode_jpeg(img, channels=3)
 
     # Redimensionar la imatge al tamany definit
-    img = tf.image.resize(img, IMG_SIZE)
-
+    img = tf.image.resize_with_pad(img, IMG_SIZE[0], IMG_SIZE[1])
+    
     # Normalització específica del model EfficientNet
-    img = preprocess_input(img)
+    # img = preprocess_input(img)
+
+    # Convertim a float32
+    img = tf.cast(img, tf.float32)      # per EfficientNetV2 
 
     return img, label
 

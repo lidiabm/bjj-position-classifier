@@ -47,7 +47,8 @@ def save_model_artifacts (model, run_dir, config):
     ensure_dir(run_dir)
 
     # Guarda imatge de l'arquitectura
-    keras.utils.plot_model(model, to_file=os.path.join(run_dir, "model_architecture.png"), show_shapes=True, show_layer_names=True, expand_nested=True, dpi=120)
+    keras.utils.plot_model(model, to_file=os.path.join(run_dir, "model_architecture_full.png"), show_shapes=True, show_layer_names=True, expand_nested=True, dpi=120)
+    keras.utils.plot_model(model, to_file=os.path.join(run_dir, "model_architecture.png"), show_shapes=True, show_layer_names=True, expand_nested=False, dpi=120)
 
     # Guardar summary
     with open(os.path.join(run_dir, "model_summary.txt"), "w", encoding="utf-8") as f:
