@@ -1,11 +1,11 @@
 import tensorflow as tf
 import os
-from .config import TRAIN_CSV, VAL_CSV, MODELS_DIR, OUTPUTS_DIR, LR, EPOCHS, IMG_SIZE, BACKBONE, EXPERIMENT_NAME
+from .config import TRAIN_CSV, VAL_CSV, MODELS_DIR, RESULTS_DIR, LR, EPOCHS, IMG_SIZE, BACKBONE, EXPERIMENT_NAME
 from .data import load_trainval_splits, build_label_mapping, add_labels, make_dataset
 from .model import build_model, compile_model
 from .utils import ensure_dir, save_json, save_model_artifacts
 
-def build_callbacks(model_dir):
+def build_callbacks(model_dir, training_results_dir):
     """
     Crea i retorna la llista de callbacks que s'utilitzaran durant l'entrenament.
 
@@ -45,7 +45,7 @@ def build_callbacks(model_dir):
             verbose=1
         ),
         tf.keras.callbacks.CSVLogger(
-            filename=os.path.join(model_dir, "history.csv"),
+            filename=os.path.join(training_results_dir, "history.csv"),
             append=False
         )
     ]
@@ -53,7 +53,9 @@ def build_callbacks(model_dir):
 def main():
     # Crea les carperes de sortida  
     model_dir = os.path.join(MODELS_DIR, EXPERIMENT_NAME)
+    training_results_dir = os.path.join(RESULTS_DIR, EXPERIMENT_NAME, "training")
     ensure_dir(model_dir)
+    ensure_dir(training_results_dir)
 
     # Carrega els splits d'entrenament i validació (csv)
     train_df, val_df = load_trainval_splits(TRAIN_CSV, VAL_CSV)
@@ -89,7 +91,7 @@ def main():
     )
 
     # Callbacks
-    callbacks = build_callbacks(model_dir)
+    callbacks = build_callbacks(model_dir, training_results_dir)
 
     # Entrena
     model.fit(

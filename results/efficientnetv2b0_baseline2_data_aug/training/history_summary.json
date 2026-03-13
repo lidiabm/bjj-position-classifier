@@ -1,0 +1,7 @@
+{
+  "best_epoch_by_val_loss": 16,
+  "best_val_loss": 0.5366228222846985,
+  "best_epoch_by_val_accuracy": 16,
+  "best_val_accuracy": 0.829721987247467,
+  "last_epoch": 21
+}
