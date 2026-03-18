@@ -4,3 +4,5 @@ tensorflow
 matplotlib
 pydot   # para crear/probar modelos 
 # necesario instalar Graphviz para crear/probar modelos
+seaborn
+torch torchvision

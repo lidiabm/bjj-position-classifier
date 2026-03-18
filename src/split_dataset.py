@@ -29,6 +29,7 @@ for ann in annotations:
 df = pd.DataFrame(samples)
 print("Mostres totals:", len(df))
 
+
 # Split en train, validation i test  
 train_val, test = train_test_split(
     df,
@@ -44,6 +45,7 @@ train, val = train_test_split(
 )
 
 # Guardar CSVs
+df.to_csv(os.path.join(OUTPUT_SPLITS, "df.csv"), index=False)
 train.to_csv(os.path.join(OUTPUT_SPLITS, "train.csv"), index=False)
 val.to_csv(os.path.join(OUTPUT_SPLITS, "val.csv"), index=False)
 test.to_csv(os.path.join(OUTPUT_SPLITS, "test.csv"), index=False)

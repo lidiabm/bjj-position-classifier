@@ -1,2 +1,0 @@
-model_path,test_loss,test_accuracy,keras_accuracy,keras_top3,top3_accuracy,top5_accuracy,f1_macro,f1_weighted,precision_macro,recall_macro,ece,num_test_samples,num_classes
-models\efficientnetv2b0_baseline2\best_model.keras,0.533007025718689,0.8268207515796475,0.8268207311630249,0.9593448638916016,0.9593448619886931,0.9856168939142002,0.7840091993712455,0.8213169857738809,0.8025466863458656,0.7844489939159246,0.03259260580315321,24056,18

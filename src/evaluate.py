@@ -6,14 +6,13 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from sklearn.metrics import (classification_report, confusion_matrix, f1_score, precision_score, recall_score, accuracy_score)
-from .config import TEST_CSV, MODELS_DIR, OUTPUTS_DIR, RESULTS_DIR, EXPERIMENT_NAME
-from .data import add_labels, make_dataset
+from .config import TEST_CSV, MODELS_DIR, RESULTS_DIR, EXPERIMENT_NAME, TRAIN_CSV, VAL_CSV
+from .data import add_labels, make_dataset, load_trainval_splits, build_label_mapping
 from .utils import ensure_dir
 
 # Paleta i estil global, perquè totes les figures tinguin una aparença consistent
 PLOT_STYLE = "seaborn-v0_8-whitegrid"
 CMAP_MAIN = "Blues"
-
 plt.style.use(PLOT_STYLE)
 plt.rcParams.update({
     "figure.dpi": 120,
@@ -426,9 +425,12 @@ def main():
     ensure_dir(preds_dir)
 
     # Carregar mapping de classes, assegurant que la codificació és consistent amb l'entrenament
-    mapping_path = os.path.join(OUTPUTS_DIR, "class_to_idx.json")
-    with open(mapping_path, "r", encoding="utf-8") as f:
-        class_to_idx = json.load(f)
+    # mapping_path = os.path.join(OUTPUTS_DIR, "class_to_idx.json")
+    # with open(mapping_path, "r", encoding="utf-8") as f:
+    #     class_to_idx = json.load(f)
+    train_df, val_df = load_trainval_splits(TRAIN_CSV, VAL_CSV)
+    test_df = pd.read_csv(TEST_CSV)
+    classes, class_to_idx = build_label_mapping(train_df)
     
     # s'inverteix el mapping (int: posició), per obtenir una llista ordenada de noms de posicions segons l’índex.
     idx_to_class = {int(v): k for k, v in class_to_idx.items()}  
@@ -437,7 +439,6 @@ def main():
     labels = list(range(num_classes))
 
     # Carregar test i crear dataset
-    test_df = pd.read_csv(TEST_CSV)
     test_df = add_labels(test_df, class_to_idx)
     test_ds = make_dataset(test_df, training=False)
 

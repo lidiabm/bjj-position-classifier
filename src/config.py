@@ -11,8 +11,14 @@ TEST_CSV  = f"{SPLITS_DIR}/test.csv"
 MODELS_DIR = "models"       # directori on es troben els models 
 RESULTS_DIR = "results"     # directori on es troben els resultats del model en en conjunt de test 
 
-EXPERIMENT_NAME = "efficientnetv2b0_baseline2_data_aug" # nom del experiment
+EXPERIMENT_NAME = "efficientnetv2b0_finetuning" # nom del experiment
 BACKBONE = "EfficientNetV2B0"    # backbone del model (quina CNN preentrenada s'usarà com a base)
 
-LR = 1e-3                   # learning rate
-EPOCHS = 100                # quantes vegades el model veu el dataset
+# LR = 1e-3                   # learning rate
+# EPOCHS = 100                # quantes vegades el model veu el dataset
+
+LR_HEAD = 1e-3
+EPOCHS_HEAD = 15
+
+LR_FINE = 1e-5
+EPOCHS_FINE = 30

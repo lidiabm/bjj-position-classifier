@@ -1,0 +1,16 @@
+{
+  "model_path": "models\\efficientnetv2b0_baseline\\best_model.keras",
+  "test_loss": 0.24087414145469666,
+  "test_accuracy": 0.9287080146325241,
+  "keras_accuracy": 0.928708016872406,
+  "keras_top3": 0.9908546805381775,
+  "top3_accuracy": 0.9908546724309943,
+  "top5_accuracy": 0.9981293648154307,
+  "f1_macro": 0.9102867074319606,
+  "f1_weighted": 0.9278030969187638,
+  "precision_macro": 0.9180019818927071,
+  "recall_macro": 0.9050541103784684,
+  "ece": 0.04908862479568755,
+  "num_test_samples": 24056,
+  "num_classes": 18
+}

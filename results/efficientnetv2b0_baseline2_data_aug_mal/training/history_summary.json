@@ -1,0 +1,7 @@
+{
+  "millor_epoch_segons_val_loss": 16,
+  "millor_val_loss": 0.5366228222846985,
+  "millor_epoch_segons_val_accuracy": 16,
+  "millor_val_accuracy": 0.829721987247467,
+  "ultima_epoch": 21
+}
