@@ -1,0 +1,21 @@
+{
+  "experiment_name": "efficientnetv2b0_finetuning",
+  "backbone": "EfficientNetV2B0",
+  "input_shape": [
+    224,
+    224,
+    3
+  ],
+  "num_classes": 18,
+  "do_fine_tuning": true,
+  "fine_tune_last_n": 30,
+  "learning_rate_head": 0.001,
+  "epochs_head": 15,
+  "learning_rate_fine": 1e-05,
+  "epochs_fine": 30,
+  "loss": "sparse_categorical_crossentropy",
+  "metrics": [
+    "accuracy",
+    "top_3_accuracy"
+  ]
+}

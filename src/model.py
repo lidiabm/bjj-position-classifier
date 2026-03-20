@@ -1,7 +1,3 @@
-import tensorflow as tf
-from tensorflow.keras import layers, Model
-from tensorflow.keras.applications import EfficientNetV2B0
-
 # from tensorflow.keras.applications import MobileNetV2
 # from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 
@@ -131,6 +127,10 @@ from tensorflow.keras.applications import EfficientNetV2B0
 
 #     return model
 
+import tensorflow as tf
+from tensorflow.keras import layers, Model
+from tensorflow.keras.applications import EfficientNetV2B0
+
 def build_model(num_classes: int, input_shape=(224, 224, 3), backbone_trainable: bool = False):
     """
     Construeix un model de classificació basat en transfer learning amb EfficientNetV2B0.
@@ -153,15 +153,16 @@ def build_model(num_classes: int, input_shape=(224, 224, 3), backbone_trainable:
     base = EfficientNetV2B0(
         weights="imagenet",
         include_top=False,
-        input_shape=input_shape
+        input_shape=input_shape,
     )
+    base._name = "backbone"
     base.trainable = backbone_trainable
 
     # Input del model
     inputs = layers.Input(shape=input_shape)
 
     # Backbone
-    x = base(inputs, training=backbone_trainable)
+    x = base(inputs, training=False)
 
     # Convertir mapa de features a vector
     x = layers.GlobalAveragePooling2D()(x)

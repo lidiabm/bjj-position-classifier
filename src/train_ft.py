@@ -1,9 +1,16 @@
 import tensorflow as tf
 import os
-from .config import TRAIN_CSV, VAL_CSV, MODELS_DIR, RESULTS_DIR, IMG_SIZE, BACKBONE, EXPERIMENT_NAME, LR_HEAD, EPOCHS_HEAD, LR_FINE, EPOCHS_FINE
+from .config import (
+    TRAIN_CSV, VAL_CSV,
+    MODELS_DIR, RESULTS_DIR,
+    IMG_SIZE, BACKBONE, EXPERIMENT_NAME, RUN_DIR,
+    LR_HEAD, EPOCHS_HEAD,
+    LR_FINE, EPOCHS_FINE,
+    DO_FINE_TUNING, FINE_TUNE_LAST_N
+)
 from .data import load_trainval_splits, build_label_mapping, add_labels, make_dataset
 from .model import build_model, compile_model
-from .utils import ensure_dir, save_json, save_model_artifacts
+from .utils import ensure_dir, save_model_artifacts
 
 def build_callbacks(model_dir, training_results_dir, history_name="history.csv"):
     """
@@ -52,8 +59,8 @@ def build_callbacks(model_dir, training_results_dir, history_name="history.csv")
 
 def main():
     # Crea les carperes de sortida  
-    model_dir = os.path.join(MODELS_DIR, EXPERIMENT_NAME)
-    training_results_dir = os.path.join(RESULTS_DIR, EXPERIMENT_NAME, "training")
+    model_dir = os.path.join(MODELS_DIR, RUN_DIR)
+    training_results_dir = os.path.join(RESULTS_DIR, RUN_DIR, "training")
     ensure_dir(model_dir)
     ensure_dir(training_results_dir)
 
@@ -100,10 +107,10 @@ def main():
     model.fit(train_ds, validation_data=val_ds, epochs=EPOCHS_HEAD, callbacks=callbacks_head)
 
     # FASE 2: fine-tuning
-    backbone = model.get_layer("efficientnetv2-b0")
+    backbone = model.get_layer("backbone")
     backbone.trainable = True
 
-    # Abrir solo las últimas capas
+    # Descongelar només les últimes capes del backbone
     for layer in backbone.layers[:-30]:
         layer.trainable = False
 

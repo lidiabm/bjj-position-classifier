@@ -4,19 +4,17 @@ from .config import IMG_SIZE, BATCH_SIZE, SEED
 
 def load_trainval_splits(train_csv: str, val_csv: str):
     """
-    Carrega els CSV dels splits del dataset (train, validation i test)
+    Carrega els CSV dels splits del dataset (train i validation)
     Aquests CSV contenen, com a mínim: image_path (ruta de la imatge) i position (etiqueta de la posició)
 
     Args:
         train_csv (str): Ruta al CSV del conjunt d'entrenament.
         val_csv (str): Ruta al CSV del conjunt de validació.
-        test_csv (str): Ruta al CSV del conjunt de test.
 
     Returns:
-        tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
+        tuple[pd.DataFrame, pd.DataFrame]:
             - train_df: DataFrame amb les mostres d'entrenament
             - val_df: DataFrame amb les mostres de validació
-            - test_df: DataFrame amb les mostres de test
     """
 
     train_df = pd.read_csv(train_csv)
@@ -24,6 +22,21 @@ def load_trainval_splits(train_csv: str, val_csv: str):
 
     return train_df, val_df
 
+def load_df(df_csv: str):
+    """
+    Carrega el CSV del dataset complet
+    Aquests CSV contenen, com a mínim: image_path (ruta de la imatge) i position (etiqueta de la posició)
+
+    Args:
+        df_csv (str): Ruta al CSV del conjunt complet
+
+    Returns:
+        train_df: DataFrame amb totes les mostres
+            
+    """
+
+    df = pd.read_csv(df_csv)
+    return df
 
 def build_label_mapping(train_df: pd.DataFrame):
     """
