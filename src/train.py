@@ -64,7 +64,7 @@ def unfreeze_backbone_last_layers(model, last_n=30):
     """
     Descongela només les últimes capes del backbone per al fine-tuning.
     """
-    backbone = model.get_layer("backbone")
+    backbone = model.get_layer("efficientnetv2-b0")
     backbone.trainable = True
 
     for layer in backbone.layers[:-last_n]:
