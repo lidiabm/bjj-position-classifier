@@ -3,7 +3,7 @@ import json
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from .config import RESULTS_DIR, EXPERIMENT_NAME
+from .config import RESULTS_DIR, EXPERIMENT_NAME, RUN_DIR
 from .utils import ensure_dir
 
 # Paleta i estil global, perquè totes les figures tinguin una aparença consistent
@@ -71,7 +71,7 @@ def load_history(training_results_dir: str) -> pd.DataFrame:
 
 def main():
     # Directori on es guarden els resultats relacionats amb l'entrenament
-    training_results_dir = os.path.join(RESULTS_DIR, EXPERIMENT_NAME, "training")
+    training_results_dir = os.path.join(RESULTS_DIR, RUN_DIR, "training")
     ensure_dir(training_results_dir)
 
     history = load_history(training_results_dir)

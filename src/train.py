@@ -9,7 +9,7 @@ from .config import (
     LR_FINE, EPOCHS_FINE,
     DO_FINE_TUNING, FINE_TUNE_LAST_N
 )
-from .data import load_trainval_splits, build_label_mapping, add_labels, make_dataset, load_df
+from .data import load_trainval_splits, add_labels, make_dataset, get_all_positions
 from .model import build_model, compile_model
 from .utils import ensure_dir, save_model_artifacts
 
@@ -82,10 +82,9 @@ def main():
 
     # Carrega els splits d'entrenament i validació (csv)
     train_df, val_df = load_trainval_splits(TRAIN_CSV, VAL_CSV)
-    df = load_df(DF_CSV)
 
     # Crea el mapping de classes en train i converteix etiquetes string a enters
-    all_classes = sorted(df["position"].unique())
+    all_classes = get_all_positions()
     class_to_idx = {c: i for i, c in enumerate(all_classes)}
     train_df = add_labels(train_df, class_to_idx)
     val_df = add_labels(val_df, class_to_idx)

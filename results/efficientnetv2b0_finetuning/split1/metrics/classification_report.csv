@@ -1,0 +1,22 @@
+,precision,recall,f1-score,support
+5050_guard,0.0,0.0,0.0,0.0
+back1,0.0,0.0,0.0,7063.0
+back2,0.0,0.0,0.0,6156.0
+closed_guard1,0.0,0.0,0.0,0.0
+closed_guard2,0.0,0.0,0.0,0.0
+half_guard1,0.0,0.0,0.0,0.0
+half_guard2,0.0,0.0,0.0,0.0
+mount1,0.0,0.0,0.0,0.0
+mount2,0.0,0.0,0.0,0.0
+open_guard1,0.0,0.0,0.0,0.0
+open_guard2,0.0,0.0,0.0,0.0
+side_control1,0.0,0.0,0.0,0.0
+side_control2,0.0,0.0,0.0,0.0
+standing,0.0,0.0,0.0,0.0
+takedown1,0.0,0.0,0.0,0.0
+takedown2,0.0,0.0,0.0,0.0
+turtle1,0.0,0.0,0.0,0.0
+turtle2,0.0,0.0,0.0,0.0
+accuracy,0.0,0.0,0.0,0.0
+macro avg,0.0,0.0,0.0,13219.0
+weighted avg,0.0,0.0,0.0,13219.0

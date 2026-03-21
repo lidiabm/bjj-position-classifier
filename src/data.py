@@ -1,6 +1,6 @@
 import pandas as pd
 import tensorflow as tf
-from .config import IMG_SIZE, BATCH_SIZE, SEED
+from .config import IMG_SIZE, BATCH_SIZE, SEED, DF_CSV
 
 def load_trainval_splits(train_csv: str, val_csv: str):
     """
@@ -156,3 +156,20 @@ def make_dataset(df: pd.DataFrame, training: bool = False):
     ds = ds.prefetch(tf.data.AUTOTUNE)
 
     return ds
+
+def get_all_positions():
+    """
+    Obté la llista completa de les posicions del dataset.
+
+    Aquesta funció carrega el dataset complet definit en DF_CSV y extreu totes les etiquetes 
+    úniques de la columna 'position'. Les classes es retornen ordenades alfabèticament per 
+    garantir consistencia entre execucions.
+
+    Returns:
+        list[str]: lllista ordenada de totes las classes del dataset.    
+    """
+
+    df = pd.read_csv(DF_CSV)
+    classes = sorted(df["position"].unique())
+
+    return classes

@@ -6,8 +6,8 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from sklearn.metrics import (classification_report, confusion_matrix, f1_score, precision_score, recall_score, accuracy_score)
-from .config import TEST_CSV, MODELS_DIR, RESULTS_DIR, EXPERIMENT_NAME, TRAIN_CSV, VAL_CSV
-from .data import add_labels, make_dataset, load_trainval_splits, build_label_mapping
+from .config import TEST_CSV, MODELS_DIR, RESULTS_DIR, RUN_DIR
+from .data import add_labels, make_dataset, get_all_positions
 from .utils import ensure_dir
 
 # Paleta i estil global, perquè totes les figures tinguin una aparença consistent
@@ -414,8 +414,8 @@ def save_confidence_histograms(y_prob: np.ndarray, y_true: np.ndarray, y_pred: n
 
 def main():
     # Directoris de sortida
-    run_name = EXPERIMENT_NAME    # canvia segons l'experiment 
-    run_dir = os.path.join(RESULTS_DIR, run_name)
+    experiment_dir = RUN_DIR    # canvia segons l'experiment 
+    run_dir = os.path.join(RESULTS_DIR, experiment_dir)
 
     figures_dir = os.path.join(run_dir, "figures")
     metrics_dir = os.path.join(run_dir, "metrics")
@@ -428,9 +428,9 @@ def main():
     # mapping_path = os.path.join(OUTPUTS_DIR, "class_to_idx.json")
     # with open(mapping_path, "r", encoding="utf-8") as f:
     #     class_to_idx = json.load(f)
-    train_df, val_df = load_trainval_splits(TRAIN_CSV, VAL_CSV)
     test_df = pd.read_csv(TEST_CSV)
-    classes, class_to_idx = build_label_mapping(train_df)
+    all_classes = get_all_positions()
+    class_to_idx = {c: i for i, c in enumerate(all_classes)}
     
     # s'inverteix el mapping (int: posició), per obtenir una llista ordenada de noms de posicions segons l’índex.
     idx_to_class = {int(v): k for k, v in class_to_idx.items()}  
@@ -443,7 +443,7 @@ def main():
     test_ds = make_dataset(test_df, training=False)
 
     # Carregar model entrenat 
-    model_path = os.path.join(MODELS_DIR, EXPERIMENT_NAME, "best_model.keras")
+    model_path = os.path.join(MODELS_DIR, RUN_DIR, "best_model.keras")
     model = tf.keras.models.load_model(model_path)
 
     # Evaluació bàsica amb Keras (loss + accuracy)
@@ -500,7 +500,7 @@ def main():
     
     metrics_df = pd.DataFrame([metrics])
     metrics_df.to_csv(os.path.join(metrics_dir,"metrics.csv"), index=False)
-    metrics_df_num = metrics_df.drop(columns=["model_path", "run_name"], errors="ignore")
+    metrics_df_num = metrics_df.drop(columns=["model_path"], errors="ignore")
     save_table_as_image(metrics_df_num, os.path.join(metrics_dir, "metrics.png"), title="Mètriques globals del model (test)")
 
     
